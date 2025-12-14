@@ -13,6 +13,7 @@ export class EventController {
 
     async createEvent(req: express.Request, res: express.Response): Promise<void> {
         const eventData = req.body;
+        console.log("Creating event with data:", eventData);
         try {
             const mongooseService = await MongooseService.getInstance();
             const eventService = mongooseService.eventService;
@@ -67,7 +68,7 @@ export class EventController {
 
     buildRouter(): express.Router {
         const router = express.Router();
-        router.post('/create',requireAuth(), express.json(), this.createEvent.bind(this));
+        router.post('/create', express.json(), requireAuth(), this.createEvent.bind(this));
         router.get('/', this.getAllEvents.bind(this));
         router.get('/:id', this.getEventById.bind(this));
         return router;

@@ -2,7 +2,6 @@ import { Schema } from 'mongoose';
 import { ITicket, TicketStatus } from '../../../models';
 
 export const TicketSchema = new Schema<ITicket>({
-    _id: { type: String, required: true },
     eventId: { type: String, required: true },
     category: { type: String, required: true },
     userId: { type: String, required: true },

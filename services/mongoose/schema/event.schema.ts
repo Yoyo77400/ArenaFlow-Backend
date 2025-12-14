@@ -2,7 +2,6 @@ import { Schema } from 'mongoose';
 import { IEvent, EventStatus } from '../../../models/event.interface';
 
 export const EventSchema = new Schema<IEvent>({
-    _id: { type: String, required: true },
     name: { type: String, required: true },
     date: { type: Date, required: true },
     location: { type: String, required: true },

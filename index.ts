@@ -1,18 +1,35 @@
 import express from 'express';
-const cors = require('cors');
+import cors from "cors";
+import path from 'path';
 import { config } from 'dotenv';
 import { MongooseService } from './services/mongoose';
 import { AuthController, EventController, TicketController } from './controllers/index';
 
 config();
 
+const allowedOrigins = [
+  "http://localhost:5173", // Vite
+];
+
 function launchAPI() {
   const app = express();
   const port = process.env.PORT || 3000;
 
-  app.use(cors());
+  app.use(
+  cors({
+    origin: (origin, callback) => {
+      // origin undefined = Postman / curl
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
   app.use(express.json());
 
+  const uploadsDir = path.join(process.cwd(), "uploads");
+  app.use("/uploads", express.static(uploadsDir, { maxAge: "7d", etag: true }));
   app.use('/auth', AuthController.getInstance().buildRouter());
   app.use('/events', EventController.getInstance().buildRouter());
   app.use('/tickets', TicketController.getInstance().buildRouter());

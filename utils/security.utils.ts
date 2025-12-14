@@ -66,7 +66,6 @@ export class SecurityUtils {
 
        const signingKey = await instance.client.getSigningKey(kid);
        const publicKey = signingKey.getPublicKey();
-       console.log("Using public key for verification:", publicKey);
 
        // Vérifier le JWT avec la clé publique Dynamic Labs
        const decodedToken = jwt.verify(encodedJwt, publicKey, {
@@ -78,7 +77,6 @@ export class SecurityUtils {
         console.error("JWT verification returned null");
         return { userId: "", isValid: false };
       }
-       console.log("Token verified successfully for user:", decodedToken);
 
        return { userId: decodedToken.sub!, isValid: true };
      } catch (error) {

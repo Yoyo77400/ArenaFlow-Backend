@@ -14,9 +14,7 @@ export class AuthController {
     async login(req: express.Request, res: express.Response): Promise<void> {
         const { publicKey, userId } = req.body;
         const token = req.headers['authorization'] as string;
-
-        console.log(token, publicKey, userId);
-
+        console.log(token);
         if (!publicKey || !token || !userId) {
             res.status(400).end();
             return
@@ -33,7 +31,6 @@ export class AuthController {
             }
 
             const user = await userService.getUserByDynamicUserId(userIdFromToken);
-            console.log("user", user);
 
             if (!user) {
                 res.status(401).end();
@@ -95,10 +92,7 @@ export class AuthController {
 
     async verifyAdmin(req: express.Request, res: express.Response): Promise<void> {
         
-        console.log("verifyAdmin");
         const token = req.headers['authorization'] as string;
-
-        console.log("token verifyAdmin", token);
         
         if (!token) {
             res.status(401).json({ error: "Authorization token required" });
@@ -108,7 +102,6 @@ export class AuthController {
         try {
             // Vérifier le token JWT
             const {isValid, userId} = await SecurityUtils.verifyDynamicToken(token);
-            console.log("isValid:", isValid, "userId:", userId);
             if (!isValid) {
                 res.status(401).json({ error: "Invalid token" });
                 return;
