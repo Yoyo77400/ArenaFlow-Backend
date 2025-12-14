@@ -2,7 +2,7 @@ import express from 'express';
 const cors = require('cors');
 import { config } from 'dotenv';
 import { MongooseService } from './services/mongoose';
-import { AuthController } from './controllers/index';
+import { AuthController, EventController, TicketController } from './controllers/index';
 
 config();
 
@@ -14,6 +14,9 @@ function launchAPI() {
   app.use(express.json());
 
   app.use('/auth', AuthController.getInstance().buildRouter());
+  app.use('/events', EventController.getInstance().buildRouter());
+  app.use('/tickets', TicketController.getInstance().buildRouter());
+
 
   app.get('/', (req: express.Request, res: express.Response) => {
     res.send('Welcome to Arenaflow API');

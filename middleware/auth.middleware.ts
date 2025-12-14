@@ -2,7 +2,7 @@ import express from 'express';
 import { MongooseService } from '../services/mongoose/mongoose.service';
 import { SecurityUtils } from '../utils/security.utils';
 
-export default function authMiddleware(): express.RequestHandler { 
+/*export default function authMiddleware(): express.RequestHandler { 
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const token = req.headers['Authorization'] as string;
         const dynamicUserId = req.headers['dynamic-user-id'] as string;
@@ -42,4 +42,49 @@ export default function authMiddleware(): express.RequestHandler {
         });
         next();
     };
+}*/
+
+export type AuthenticatedRequest = express.Request & {
+  user?: any; // tu peux typer avec ton IUser
+  dynamicUserId?: string;
+};
+
+export default function requireAuth(): express.RequestHandler {
+  return async (req: AuthenticatedRequest, res, next) => {
+    try {
+      const auth = req.headers["authorization"];
+      const token = typeof auth === "string" && auth.startsWith("Bearer ")
+        ? auth.slice("Bearer ".length)
+        : (typeof auth === "string" ? auth : null);
+
+      if (!token) {
+        res.status(401).json({ error: "Unauthorized: Bearer token required" });
+        return;
+      }
+
+      const { userId: dynamicUserId, isValid } = await SecurityUtils.verifyDynamicToken(token);
+      if (!isValid || !dynamicUserId) {
+        res.status(401).json({ error: "Unauthorized: Invalid token" });
+        return;
+      }
+
+      const mongooseService = await MongooseService.getInstance();
+      if (!mongooseService) {
+        res.status(500).json({ error: "Mongoose service not initialized" });
+        return;
+      }
+
+      const user = await mongooseService.userService.getUserByDynamicUserId(dynamicUserId);
+      if (!user) {
+        res.status(401).json({ error: "Unauthorized: User not found" });
+        return;
+      }
+
+      req.user = user;
+      req.dynamicUserId = dynamicUserId;
+      next();
+    } catch (e) {
+      res.status(401).json({ error: "Unauthorized" });
+    }
+  };
 }

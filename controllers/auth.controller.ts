@@ -25,16 +25,17 @@ export class AuthController {
         try {
             const mongooseService = await MongooseService.getInstance();
             const userService = mongooseService.userService;
-            const user = await userService.getUserByDynamicUserId(userId);
-            console.log("user", user);
 
-            if (!user) {
+            const {userId: userIdFromToken, isValid} = await SecurityUtils.verifyDynamicToken(token);
+            if (!userIdFromToken || !isValid) {
                 res.status(401).end();
                 return;
             }
 
-            const encryptedSignature = await SecurityUtils.verifyDynamicToken(token);
-            if (!encryptedSignature) {
+            const user = await userService.getUserByDynamicUserId(userIdFromToken);
+            console.log("user", user);
+
+            if (!user) {
                 res.status(401).end();
                 return;
             }
@@ -107,6 +108,7 @@ export class AuthController {
         try {
             // Vérifier le token JWT
             const {isValid, userId} = await SecurityUtils.verifyDynamicToken(token);
+            console.log("isValid:", isValid, "userId:", userId);
             if (!isValid) {
                 res.status(401).json({ error: "Invalid token" });
                 return;

@@ -1,6 +1,6 @@
 import { Mongoose, connect } from "mongoose";
 import { config } from "dotenv";
-import { UserService, AddressService, KYCService, LegalsService } from "./index";
+import { UserService, AddressService, KYCService, LegalsService, TicketService, EventService } from "./index";
 
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } } as const;
 
@@ -11,6 +11,8 @@ export class MongooseService {
   public addressService: AddressService;
   public kycService: KYCService;
   public legalService: LegalsService;
+  public ticketService: TicketService;
+  public eventService: EventService;
 
   private constructor(mongoose: Mongoose) {
     this.mongoose = mongoose;
@@ -18,6 +20,8 @@ export class MongooseService {
     this.addressService = new AddressService(this);
     this.kycService = new KYCService(this);
     this.legalService = new LegalsService(this);
+    this.ticketService = new TicketService(this);
+    this.eventService = new EventService(this);
   }
 
   public static async getInstance(): Promise<MongooseService> {

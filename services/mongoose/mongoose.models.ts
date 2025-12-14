@@ -3,4 +3,6 @@ export const Models = {
     Address: "Address",
     KYC: "KYC",
     Legals: "Legals",
+    Ticket: "Ticket",
+    Event: "Event"
 }
